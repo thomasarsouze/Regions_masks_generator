@@ -1,4 +1,4 @@
-# What is Regions_maskd_generator ?
+# What is Regions_masks_generator ?
 This tools aims at generating regions mask in netcdf format in a way that it can be ported to any configuration and / or any model, to allow for simple comparisons when dealing with regional studies from larger models.
 
 The script run_create_regions.py provides a simple example of all the steps and functions. 
