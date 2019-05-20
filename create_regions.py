@@ -1,6 +1,7 @@
 # Adapted from https://gist.github.com/jbeezley/3442777 for kmz files handling
 
 import xarray as xr
+import numpy as np
 import regionmask
 import os
 import sys
@@ -23,12 +24,15 @@ def define_config(fmask,lon_name,lat_name,mask_name='tmask'):
         fmask     : name of the mesh_mask file of the configuration
         lon_name  : name of the longitude variable
         lat_name  : name of the latitude variable
-        mask_name : name of the mask variable. Default is 'tmask'
+        mask_name : name of the mask variable. Default is 'tmask'. If set to None: no land-sea mask will be used.
     """
     global longitude, latitude, mask_data
     longitude = xr.open_dataset(fmask)[lon_name]
     latitude  = xr.open_dataset(fmask)[lat_name]
-    mask_data = xr.open_dataset(fmask)[mask_name].isel(t=0,z=0)
+    if mask_name:
+        mask_data = xr.open_dataset(fmask)[mask_name].isel(t=0,z=0)
+    else:
+        mask_data = xr.DataArray(np.ones(longitude.shape),dims=('y','x'))
 
 def create_region(name,abbrev,limits,wrap_lon=False):
     """
