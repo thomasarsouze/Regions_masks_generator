@@ -8,6 +8,8 @@ import sys
 from xml.dom.minidom import parseString
 from zipfile import ZipFile
 from io import StringIO
+from distutils.util import strtobool
+import shapely
 
 try:
   basestring
@@ -16,6 +18,13 @@ except NameError:
 
 regions_dict = dict()
 list_abbrevs=[]
+
+def clean():
+    """
+    Cleans everything to start a new definition of regions
+    """
+    regions_dict = dict()
+    list_abbrevs=[]
 
 def define_config(fmask,lon_name,lat_name,mask_name='tmask'):
     """
@@ -39,12 +48,27 @@ def create_region(name,abbrev,limits,wrap_lon=False):
     Creates a region mask and stores it into regions_dict dictionnary
     """
     print('Creating region %s' % name)
+    #Dealing with the case of attempt to define two times the same region
+    if name in regions_dict.keys():
+        choice=None
+        while not choice:
+            choice=input('!!! region %s already defined, do you want to create it anyway ? (y/n)' % name).lower()
+            if choice=='y':
+                choice=True
+                name=_update_names(name)
+            elif choice=='n':
+                choice=True
+                print('ok, this region will not be created')
+                return None
+            else:            
+                sys.stdout.write('Please respond with \'y\' or \'n\'.\n')
+                choice=None
     abbrev=_update_abbrevs(abbrev)
     short_name = 'tmask'+abbrev
     region      = regionmask.Regions_cls(short_name, [0], [name], [abbrev], [limits])
     region_mask = region.mask(longitude,latitude,wrap_lon=wrap_lon)
     region_mask = (mask_data * xr.where(region_mask,0,1)).rename(short_name)
-    regions_dict.update({name:(region_mask,limits)})
+    regions_dict[name]=(region_mask,limits)
 
 def _openKMZ(filename):
     zip=ZipFile(filename)
@@ -154,9 +178,14 @@ def update_region(region,polygon):
 
 def _update_abbrevs(abbrev):
     while abbrev in list_abbrevs:
-        abbrev=input(abbrev+' is already used, please provide a new short name for the region : ')
+        abbrev=input(abbrev+' short name is already used for another region, please provide a new one : ')
     list_abbrevs.append(abbrev)
     return abbrev
+
+def _update_names(name):
+    while name in regions_dict.keys():
+        name=input(name+' region is already defined, please provide a new name for the region : ')
+    return name
 
 def create_regions_from_kmz(kmz_file='regions.kmz',set_abbrevs=True,append=True):
     """
@@ -235,13 +264,38 @@ def create_kmz(kmz_file='regions.kmz'):
          </Polygon>
        </Placemark>'''
 
+    multipolystr=\
+    '''     <Placemark>
+         <name>%s</name>
+         <Polygon>
+           <altitudeMode>clampedToGround</altitudeMode>
+           <outerBoundaryIs>
+           <LinearRing>
+             <coordinates>
+             %s
+             </coordinates>
+           </LinearRing>
+           </outerBoundaryIs>
+         </Polygon>
+       </Placemark>'''
+
+
+
     strs=[]
     i=0
     for region in regions_dict:
         i=i+1
         f=StringIO()
-        _writePolygon(regions_dict[region][1],f)
-        strs.append(polystr % (region,f.getvalue()))
+        if ((isinstance(regions_dict[region][1],shapely.geometry.multipolygon.MultiPolygon)) & (len(list(regions_dict[region][1]))>1)):
+            print('This is a multipolygon: we do not deal with that. Sorry but region %s will not be written into the kmz file' % region)
+        else:
+            if ((isinstance(regions_dict[region][1],shapely.geometry.multipolygon.MultiPolygon)) & (len(list(regions_dict[region][1]))==1)):
+                _writePolygon(list(map(list, zip(*regions_dict[region][1][0].exterior.coords.xy))),f)
+            elif (isinstance(regions_dict[region][1],shapely.geometry.polygon.Polygon)):
+                _writePolygon(list(map(list, zip(*regions_dict[region][1].exterior.coords.xy))),f)
+            else:
+                _writePolygon(regions_dict[region][1],f)
+            strs.append(polystr % (region,f.getvalue()))
     s='\n'.join(strs)
     s=kmlstr % (kmz_file,s)
     kml_file=kmz_file[:-3]+'kml'
