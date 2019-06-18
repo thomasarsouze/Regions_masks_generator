@@ -39,7 +39,10 @@ cr.create_region('Nino 4', 'ni4', [[160,-5], [210,-5], [210,5], [160,5], [160,-5
 cr.create_region('Nino 1+2', 'ni12', [[-90,-10], [-80,-10], [-80,0], [-90,0], [-90,-10]])
 
 
-
+# Do some plots
+###############
+for region in cr.regions_dict.keys():
+    cr.plot_region(region)
 
 #Saving regions
 ###############

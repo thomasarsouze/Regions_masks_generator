@@ -319,3 +319,20 @@ def create_nc_from_kmz(kmz_file='regions.kmz',nc_file='regions.nc',set_abbrevs=F
     create_regions_from_kmz(kmz_file,set_abbrevs,append)
     create_nc(nc_file)
 
+
+def plot_region(region):
+    """
+    Creates a simple plot of the mask
+    """
+    import matplotlib.pyplot as plt
+    import cartopy.crs as ccrs
+    import cartopy.feature as cfea
+
+    fig = plt.figure(figsize=(12,6))
+    ax = fig.add_subplot(1,1,1,projection=ccrs.PlateCarree())
+    mapa = regions_dict[region][0].plot(x='lon',y='lat',ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False)
+    ax.set_title('EC-Earth3.2 - '+regions_dict[region][0].name);ax.coastlines(resolution='50m');ax.add_feature(cfea.LAND, zorder=100);
+    gl=ax.gridlines(draw_labels=True);gl.xlabels_top = False;gl.ylabels_right = False;
+    plt.savefig(regions_dict[region][0].name+'.png')
+    plt.close()
+ 
