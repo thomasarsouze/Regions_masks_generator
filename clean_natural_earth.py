@@ -1,3 +1,4 @@
+# coding: utf8
 import xarray as xr
 import matplotlib.pyplot as plt         
 

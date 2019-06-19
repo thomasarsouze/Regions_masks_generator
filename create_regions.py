@@ -1,3 +1,4 @@
+# coding: utf8
 # Adapted from https://gist.github.com/jbeezley/3442777 for kmz files handling
 
 import xarray as xr

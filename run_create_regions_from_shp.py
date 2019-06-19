@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 import create_regions as cr
 import cartopy.io.shapereader as shpreader
 
 #user defined configuration
 ###########################
-mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O1L75.nc"
+#TA mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O1L75.nc"
+mask_file = "/Users/arsouze/Documents/Files/NEMO/mesh_mask_nemo.N3.6_O1L75.nc"
 lon_name  = "nav_lon"
 lat_name  = "nav_lat"
 mask_name = "tmask"
@@ -13,8 +15,13 @@ cr.define_config(mask_file,lon_name,lat_name,mask_name)
 # Define oceanic regions from Natural_Earth dtb
 shpfilename = shpreader.natural_earth(resolution='10m',category='physical',name='geography_marine_polys')
 reader = shpreader.Reader(shpfilename)
+cpt=0  # counter for un-named regions
 for basin,poly in zip(reader.records(),reader.geometries()):
-    cr.create_region(basin.attributes['name'],basin.attributes['name'].replace(' ','_'),poly)
+    if basin.attributes['name']:
+        cr.create_region(basin.attributes['name'],basin.attributes['name'].replace(' ','_'),poly)
+    else:
+        cpt+=1
+        cr.create_region('Unknow'+str(cpt),'Unknow'+str(cpt),poly)
 
 # List all the regions already defined
 cr.get_list_regions()
@@ -41,8 +48,8 @@ cr.create_region('Nino 1+2', 'ni12', [[-90,-10], [-80,-10], [-80,0], [-90,0], [-
 
 # Do some plots
 ###############
-for region in cr.regions_dict.keys():
-    cr.plot_region(region)
+#for region in cr.regions_dict.keys():
+#    cr.plot_region(region)
 
 #Saving regions
 ###############
@@ -50,5 +57,5 @@ for region in cr.regions_dict.keys():
 cr.create_nc('Regions_from_geo_marine.nc')
 
 # Save to kmz all the regions polygons
-cr.create_kmz('Regions_from_geo_marine.kmz')
+#cr.create_kmz('Regions_from_geo_marine.kmz')
 
