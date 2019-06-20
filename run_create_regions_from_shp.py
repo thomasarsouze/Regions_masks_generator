@@ -4,8 +4,9 @@ import cartopy.io.shapereader as shpreader
 
 #user defined configuration
 ###########################
+mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O25L75.nc"
 #TA mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O1L75.nc"
-mask_file = "/Users/arsouze/Documents/Files/NEMO/mesh_mask_nemo.N3.6_O1L75.nc"
+#TA mask_file = "/Users/arsouze/Documents/Files/NEMO/mesh_mask_nemo.N3.6_O1L75.nc"
 lon_name  = "nav_lon"
 lat_name  = "nav_lat"
 mask_name = "tmask"
