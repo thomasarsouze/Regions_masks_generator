@@ -4,7 +4,8 @@ import cartopy.io.shapereader as shpreader
 
 #user defined configuration
 ###########################
-mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O25L75.nc"
+mask_file = "/esarchive/autosubmit/con_files/mesh_mask.ORCA12L75.nc"
+#TA mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O25L75.nc"
 #TA mask_file = "/esarchive/autosubmit/con_files/mesh_mask_nemo.N3.6_O1L75.nc"
 #TA mask_file = "/Users/arsouze/Documents/Files/NEMO/mesh_mask_nemo.N3.6_O1L75.nc"
 lon_name  = "nav_lon"
@@ -49,8 +50,8 @@ cr.create_region('Nino 1+2', 'ni12', [[-90,-10], [-80,-10], [-80,0], [-90,0], [-
 
 # Do some plots
 ###############
-#for region in cr.regions_dict.keys():
-#    cr.plot_region(region)
+for region in cr.regions_dict.keys():
+    cr.plot_region(region)
 
 #Saving regions
 ###############

@@ -68,7 +68,7 @@ def create_region(name,abbrev,limits,wrap_lon=False):
     short_name = 'tmask'+abbrev
     region      = regionmask.Regions_cls(short_name, [0], [name], [abbrev], [limits])
     region_mask = region.mask(longitude,latitude,wrap_lon=wrap_lon)
-    region_mask = (mask_data * xr.where(region_mask,0,1)).rename(short_name)
+    region_mask = (mask_data * xr.where(region_mask,0,1)).astype('int8').rename(short_name)
     regions_dict[name]=(region_mask,limits)
 
 def _openKMZ(filename):
