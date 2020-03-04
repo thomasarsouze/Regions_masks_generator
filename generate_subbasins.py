@@ -3,16 +3,41 @@ import xarray as xr
 import matplotlib.pyplot as plt         
 import numpy as np
 
-grid='ORCA025'
+grid='1x1'
+mask_name='tmask'
+lon_name='longitude'
+lat_name='latitude'
 
 grid_name={'ORCA1':'/esarchive/scratch/barakuda/climatology/'+grid+'.L75/mesh_mask.nc4',
            'ORCA025':'/esarchive/scratch/barakuda/climatology/'+grid+'.L75/mesh_mask_ORCA025.L75_ece3.2_2017.nc4',
-           'ORCA12':'/esarchive/releases/models/nemo/v3.6_ecearth/inidata/nemo/ORCA12L75/mesh_mask_ORCA12_3.6.nc'}
-tmask = xr.open_dataset(grid_name[grid]).tmask.isel(z=0).squeeze()
+           'ORCA12':'/esarchive/releases/models/nemo/v3.6_ecearth/inidata/nemo/ORCA12L75/mesh_mask_ORCA12_3.6.nc',
+           '1x1':'/esarchive/scratch/tarsouze/Regions_masks_generator/1x1_file.nc'}
+tmask = xr.open_dataset(grid_name[grid])[mask_name].squeeze()
 ds= xr.open_dataset('Regions_from_geo_marine_'+grid+'.nc')
-tmask=tmask.to_dataset().merge(ds.coords).to_array().drop('variable').squeeze()
+tmask=tmask.to_dataset().merge(ds.coords,compat='override').to_array().drop('variable').squeeze()
 
-atl = ['North_Atlantic_Ocean','South_Atlantic_Ocean','Inner_Seas','Irish_Sea','North_Sea','Norwegian_Sea','Greenland_Sea','Scotia_Sea','Golfo_de_Urabá','Golfo_San_Jorge','Gulf_of_Guinea','Gulf_of_Honduras','Gulf_of_Maine','Gulf_of_Mexico','Gulf_of_Saint_Lawrence','Caribbean_Sea','Labrador_Sea','Bahía_Blanca','Baía_de_Marajó','Bay_of_Biscay','Bay_of_Fundy','Bight_of_Benin','Bight_of_Biafra','Chesapeake_Bay','Delaware_Bay','Massachusetts_Bay','Wager_Bay','English_Channel','Bristol_Channel','Skagerrak','Straits_of_Florida','Denmark_Strait','Yucatan_Channel','Bahía_de_Campeche','Río_de_la_Plata','Canal_Perigoso','Canal_do_Sul','Canal_do_Norte','Amazon_River','Bahía_Grande','Lagoa_dos_Patos','Bras_d\'Or_Lake','Boca_Grande','Golfo_San_Matías','Baía_de_São_Marcos','Hamilton_Inlet','Waddenzee','Strait_of_Belle_Isle','Lago_de_Maracaibo','Long_Island_Sound','Albemarle_Sound','Pamlico_Sound','Lake_Pontchartrain','Saint_Lawrence_River','Boknafjorden','St._Helena_Bay','Kattegat','Øresund']
+rename={'tmaskGolfo_de_UrabÃ¡':'tmaskGolfo_de_Urabá',
+        'tmaskBahÃ­a_Blanca':'tmaskBahía_Blanca',
+        'tmaskBaÃ­a_de_MarajÃ³':'tmaskBaía_de_Marajó',
+        'tmaskBahÃ­a_de_Campeche':'tmaskBahía_de_Campeche',
+        'tmaskRÃ­o_de_la_Plata':'tmaskRío_de_la_Plata',
+        'tmaskBahÃ­a_Grande':'tmaskBahía_Grande',
+        'tmaskGolfo_San_MatÃ­as':'tmaskGolfo_San_Matías',
+        'tmaskBaÃ­a_de_SÃ£o_Marcos':'tmaskBaía_de_São_Marcos',
+        'tmaskÃ\x98resund':'tmaskØresund',
+        'tmaskBay_InÃºtil':'tmaskBay_Inútil',
+        'tmaskGolfo_de_PanamÃ¡':'tmaskGolfo_de_Panamá',
+        'tmaskLa_PÃ©rouse_Strait':'tmaskLa_Pérouse_Strait',
+        'tmaskGulf_of_KhambhÃ¤t':'tmaskGulf_of_Khambhät',
+        'tmaskMediterranean_Sea2':'tmaskMediterranean_Sea_2',
+        'tmaskGulf_of_GabÃ¨s':'tmaskGulf_of_Gabès',
+        'tmaskGulf_of_Olenâ\x80\x98k':'tmaskGulf_of_Olen‘k',
+        'tmaskRoss_Sea2':'tmaskRoss_Sea_2',
+        'tmaskLÃ¼tzow-Holm_Bay':'tmaskLützow-Holm_Bay'
+       }
+ds=ds.rename(rename)
+
+atl = ['North_Atlantic_Ocean','South_Atlantic_Ocean','Sargasso_Sea','Inner_Seas','Irish_Sea','North_Sea','Norwegian_Sea','Greenland_Sea','Scotia_Sea','Golfo_de_Urabá','Golfo_San_Jorge','Gulf_of_Guinea','Gulf_of_Honduras','Gulf_of_Maine','Gulf_of_Mexico','Gulf_of_Saint_Lawrence','Caribbean_Sea','Labrador_Sea','Bahía_Blanca','Baía_de_Marajó','Bay_of_Biscay','Bay_of_Fundy','Bight_of_Benin','Bight_of_Biafra','Chesapeake_Bay','Delaware_Bay','Massachusetts_Bay','Wager_Bay','English_Channel','Bristol_Channel','Skagerrak','Straits_of_Florida','Denmark_Strait','Yucatan_Channel','Bahía_de_Campeche','Río_de_la_Plata','Canal_Perigoso','Canal_do_Sul','Canal_do_Norte','Amazon_River','Bahía_Grande','Lagoa_dos_Patos','Bras_d\'Or_Lake','Boca_Grande','Golfo_San_Matías','Baía_de_São_Marcos','Hamilton_Inlet','Waddenzee','Strait_of_Belle_Isle','Lago_de_Maracaibo','Long_Island_Sound','Albemarle_Sound','Pamlico_Sound','Lake_Pontchartrain','Saint_Lawrence_River','Boknafjorden','St._Helena_Bay','Kattegat','Øresund']
 pac = ['North_Pacific_Ocean','South_Pacific_Ocean','Bali_Sea','Banda_Sea','Bering_Sea','Bismarck_Sea','Celebes_Sea','Ceram_Sea','Coral_Sea','East_China_Sea','Flores_Sea','Halmahera_Sea','Inner_Sea','Java_Sea','Molucca_Sea','Philippine_Sea','Sea_of_Japan','Solomon_Sea','South_China_Sea','Sea_of_Okhotsk','Sulu_Sea','Tasman_Sea','Yellow_Sea','Bay_Inútil','Bay_of_Plenty','Golfo_de_California','Golfo_de_Panamá','Gulf_of_Alaska','Gulf_of_Thailand','Luzon_Strait','Queen_Charlotte_Sound','Smith_Sound','Gulf_of_Tonkin','Korea_Strait','Taiwan_Strait','Cook_Inlet','Shelikhova_Gulf','Bo_Hai','Great_Barrier_Reef','Karaginskiy_Gulf','San_Francisco_Bay','Monterey_Bay','Ragay_Gulf','Yangtze_River','Columbia_River','Salish_Sea','Hecate_Strait','Cordova_Bay','Gulf_of_Buli','Gulf_of_Kau','Bohol_Sea','Samar_Sea','Tayabas_Bay','Seno_de_Skyring','Seno_Otway','Gulf_of_Anadyr\'','Davao_Gulf','Gulf_of_Tomini','Sibuyan_Sea','Selat_Dampier','Leyte_Gulf','Visayan_Sea','Dixon_Entrance','Golfo_Corcovado','Kronotskiy_Gulf','Bristol_Bay','Uda_Bay','Uchiura_Bay','Tsugaru_Strait','Tatar_Strait','Golfo_de_Tehuantepec','Golfo_de_Guayaquil','La_Pérouse_Strait','East_Korea_Bay','Qiongzhou_Strait','Cook_Strait','Torres_Strait','Gulf_of_Papua','Porpoise_Bay','Norton_Sound','Golfo_de_Penas','Queen_Charlotte_Strait','Gulf_of_Sakhalin','Gulf_of_Kamchatka','Hangzhou_Bay','Estrecho_de_Magellanes','Prince_William_Sound','Makassar_Strait','Surigao_Strait','Selat_Bali']
 ind=['INDIAN_OCEAN','Andaman_Sea','Arabian_Sea','Arafura_Sea','Red_Sea','Timor_Sea','Savu_Sea','Bay_of_Bengal','Persian_Gulf','Mozambique_Channel','Laccadive_Sea','Gulf_of_Oman','Gulf_of_Aden','Bab_el_Mandeb','Gulf_of_Aqaba','Gulf_of_Carpentaria','Great_Australian_Bight','Strait_of_Malacca','Strait_of_Singapore','Gulf_of_Mannar','Gulf_of_Kutch','Gulf_of_Khambhät','Palk_Strait','Shark_Bay','Gulf_of_Masira','Geographe_Bay','Gulf_of_Suez','Gulf_of_Martaban','Joseph_Bonaparte_Gulf','Baia_de_Maputo','Gulf_St._Vincent','Antongila_Bay','Bass_Strait']
 med=['Mediterranean_Sea','Mediterranean_Sea_2','Tyrrhenian_Sea','Golfe_du_Lion','Adriatic_Sea','Ionian_Sea','Gulf_of_Gabès','Ligurian_Sea','Alboran_Sea','Sea_of_Crete','Aegean_Sea','Balearic_Sea','Dardanelles','Strait_of_Gibraltar','Gulf_of_Sidra','Sea_of_Marmara']
@@ -45,6 +70,12 @@ maskattrs={'atl':{'Desciption':'Atlantic Ocean Mask',
            'soc':{'Desciption':'Southern Ocean Mask',
                   'Details':'This mask is the sum of %s masks' % ', '.join(soc),
                   'Additional':'Latitude is extended to -43S'},
+           'sas':{'Desciption':'Southern Ocean, Atlantic sector Mask',
+                  'Additional':'Latitude is extended to -55S'},
+           'sps':{'Desciption':'Southern Ocean, Pacific sector Mask',
+                  'Additional':'Latitude is extended to -43S'},
+           'sis':{'Desciption':'Southern Ocean, Indian sector Mask',
+                  'Additional':'Latitude is extended to -43S'},
            'nna':{'Desciption':'North Atlantic North basin Mask',
                   'Details':'This mask is the sum of %s masks' % ', '.join(nna)},
            'gin':{'Desciption':'Greenland, Iceland, Norwegian Seas Mask',
@@ -73,19 +104,23 @@ maskattrs={'atl':{'Desciption':'Atlantic Ocean Mask',
             }
 
 tmaskatl = sum([ds['tmask'+sub] for sub in atl])
-tmaskatl = xr.where(ds.nav_lat<-55.,0,tmaskatl) 
+tmaskatl = xr.where(ds[lat_name]<-55.,0,tmaskatl) 
 tmaskpac = sum([ds['tmask'+sub] for sub in pac])
-tmaskpac = xr.where(ds.nav_lat<-43,0,tmaskpac)
-tmaskpac = xr.where((ds.nav_lon>179) & (ds.nav_lat>=-43) & (ds.nav_lat<25),np.minimum(tmask+tmaskpac,1),tmaskpac)
+tmaskpac = xr.where(ds[lat_name]<-43,0,tmaskpac)
+tmaskpac = xr.where((ds[lon_name]>179) & (tmaskpac.[lon_name]<181) & (ds[lat_name]>=-43) & (ds[lat_name]<25),np.minimum(tmask+tmaskpac,1),tmaskpac)
 tmaskind = sum([ds['tmask'+sub] for sub in ind])
-tmaskind = xr.where(ds.nav_lat<-43,0,tmaskind)
+tmaskind = xr.where(ds[lat_name]<-43,0,tmaskind)
 tmaskmed = sum([ds['tmask'+sub] for sub in med])
 tmaskarc = sum([ds['tmask'+sub] for sub in arc])
 tmasksoc = sum([ds['tmask'+sub] for sub in soc])
-tmasksoc = xr.where(ds.nav_lat<-43,np.minimum(tmask+tmasksoc,1),tmasksoc)
+tmasksoc = xr.where(ds[lat_name]<-43,np.minimum(tmask+tmasksoc,1),tmasksoc)
+tmasksas = tmask*tmaskatl.sel(y=-54, method='nearest').where(ds[lat_name]<-55,0)
+tmasksps = tmask*tmaskpac.sel(y=-30, method='nearest').where(ds[lat_name]<-43,0)
+tmasksps = xr.where((tmasksps[lon_name]179) & (tmasksps[lon_name]<181) & (tmaskpac[lat_name]-43),np.minimum(tmask+tmasksps,1),tmasksps).transpose()
+tmasksis = tmask*tmaskind.sel(y=-43, method='nearest').where(ds[lat_name]<-43,0)
 tmaskgin = sum([ds['tmask'+sub] for sub in gin])
 tmasknna = sum([ds['tmask'+sub] for sub in nna])
-tmasknna = xr.where(ds.nav_lat>47.,tmasknna,0)
+tmasknna = xr.where(ds[lat_name]>47.,tmasknna,0)
 tmaskbal = sum([ds['tmask'+sub] for sub in balt])
 tmaskblk = sum([ds['tmask'+sub] for sub in blk])
 tmaskgum = sum([ds['tmask'+sub] for sub in gomex])
@@ -93,7 +128,7 @@ tmaskido = sum([ds['tmask'+sub] for sub in indo])
 tmaskcar = sum([ds['tmask'+sub] for sub in carib])
 tmasklab = ds.tmaskLabrador_Sea
 tmaskwed = ds.tmaskWeddell_Sea
-tmaskwed = xr.where((ds.nav_lat<-62) & (ds.nav_lon >-60) & (ds.nav_lon <0),np.minimum(tmask+tmaskwed,1),tmaskwed)
+tmaskwed = xr.where((ds[lat_name]<-62) & (ds[lon_name] >-60) & (ds[lon_name] <0),np.minimum(tmask+tmaskwed,1),tmaskwed)
 tmaskNoH = ds.tmaskNH
 tmaskSoH = ds.tmaskSH
 tmaskgus = ds.tmaskgus
@@ -123,7 +158,7 @@ def plot_region(region):
 
     fig = plt.figure(figsize=(12,6))
     ax = fig.add_subplot(1,1,1,projection=ccrs.PlateCarree())
-    mapa = region.plot(x='nav_lon',y='nav_lat',ax=ax,transform=ccrs.PlateCarree())
+    mapa = region.plot(x=lon_name',y=lat_name',ax=ax,transform=ccrs.PlateCarree())
     land_50m = cfea.NaturalEarthFeature('physical', 'land', '50m', 
                                          edgecolor='face', 
                                          facecolor=cfea.COLORS['land'])

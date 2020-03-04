@@ -40,7 +40,8 @@ def define_config(fmask,lon_name,lat_name,mask_name='tmask'):
     longitude = xr.open_dataset(fmask)[lon_name]
     latitude  = xr.open_dataset(fmask)[lat_name]
     if mask_name:
-        mask_data = xr.open_dataset(fmask)[mask_name].isel(t=0,z=0)
+        mask_data = xr.open_dataset(fmask)[mask_name] 
+##TA.isel(t=0,z=0)
     else:
         mask_data = xr.DataArray(np.ones(longitude.shape),dims=('y','x'))
 
@@ -66,8 +67,8 @@ def create_region(name,abbrev,limits,wrap_lon=False):
                 choice=None
     abbrev=_update_abbrevs(abbrev)
     short_name = 'tmask'+abbrev
-    region      = regionmask.Regions_cls(short_name, [0], [name], [abbrev], [limits])
-    region_mask = region.mask(longitude,latitude,wrap_lon=wrap_lon)
+    region      = regionmask.Regions([limits], names=[name], abbrevs=[abbrev])
+    region_mask = region.mask(longitude,latitude).rename({'lat':'y','lon':'x'}) ##TA addition of rename
     region_mask = (mask_data * xr.where(region_mask,0,1)).astype('int8').rename(short_name)
     regions_dict[name]=(region_mask,limits)
 
@@ -232,7 +233,8 @@ def create_nc(nc_file='regions.nc'):
 
     for region in regions_dict.keys():
         ds_out = xr.merge((ds_out,regions_dict[region][0]))
-    ds_out.rename({'lon':'nav_lon','lat':'nav_lat'}).to_netcdf(nc_file)
+##TA    ds_out.rename({'lon':'nav_lon','lat':'nav_lat'}).to_netcdf(nc_file)
+    ds_out.to_netcdf(nc_file)
 
 def create_kmz(kmz_file='regions.kmz'):
     """
@@ -331,7 +333,7 @@ def plot_region(region):
 
     fig = plt.figure(figsize=(12,6))
     ax = fig.add_subplot(1,1,1,projection=ccrs.PlateCarree())
-    mapa = regions_dict[region][0].plot(x='lon',y='lat',ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False)
+    mapa = regions_dict[region][0].plot(x='longitude',y='latitude',ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False)
     ax.set_title('EC-Earth3.2 - '+regions_dict[region][0].name);ax.coastlines(resolution='50m');ax.add_feature(cfea.LAND, zorder=100);
     gl=ax.gridlines(draw_labels=True);gl.xlabels_top = False;gl.ylabels_right = False;
     plt.savefig(regions_dict[region][0].name+'.png')
